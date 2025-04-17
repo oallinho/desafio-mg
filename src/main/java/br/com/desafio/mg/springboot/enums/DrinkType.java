@@ -1,4 +1,4 @@
-package br.com.desafio.mg.springboot.model;
+package br.com.desafio.mg.springboot.enums;
 
 public enum DrinkType {
     ALCOHOLIC,
