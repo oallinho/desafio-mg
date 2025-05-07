@@ -1,8 +1,10 @@
 package br.com.desafio.mg.springboot.dto;
 
 import br.com.desafio.mg.springboot.model.StockModel;
+import jakarta.persistence.Column;
 import lombok.*;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -12,15 +14,20 @@ import java.util.UUID;
 @NoArgsConstructor
 public class StockDTO {
 
-    public StockDTO(StockModel stock){
-        BeanUtils.copyProperties(stock, this);
+    private Long id;
+
+    private int maximumSections;
+
+    private double alcoholicMaximum;
+
+    private double nonAlcoholicMaximum;
+
+    public StockDTO (StockModel stock){
+        this.id = stock.getId();
+        this.maximumSections = stock.getMaximumSections();
+        this.alcoholicMaximum = stock.getAlcoholicMaximum();
+        this.nonAlcoholicMaximum = stock.getNonAlcoholicMaximum();
+
     }
 
-    private UUID id;
-
-    private Double amount;
-
-    private OffsetDateTime createdAt;
-
-    private OffsetDateTime updatedAt;
 }

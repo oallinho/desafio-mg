@@ -15,17 +15,20 @@ import java.util.UUID;
 @NoArgsConstructor
 public class SectionDTO {
 
-    public SectionDTO(SectionModel section){
-        BeanUtils.copyProperties(section, this);
-    }
-
-    private UUID id;
-
+    private Long id;
     private DrinkType permittedType;
-
     private Double maximumCapacity;
+    private Double availableCapacity;
+    private Long stockId;
 
-    private OffsetDateTime createdAt;
+    public SectionDTO(SectionModel section, double currentVolume) {
+        this.id = section.getId();
+        this.permittedType = section.getPermittedType();
+        this.maximumCapacity = section.getMaximumCapacity();
+        this.availableCapacity = section.getMaximumCapacity() - currentVolume;
+        this.stockId = section.getStock().getId();
 
-    private OffsetDateTime updatedAt;
+    }
 }
+
+

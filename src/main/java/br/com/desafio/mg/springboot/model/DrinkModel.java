@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Setter
@@ -30,6 +31,9 @@ public class DrinkModel {
     @Column(nullable = false)
     private Double liter;
 
+    @Column(nullable = false)
+    private String name;
+
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(nullable = false)
     @CreationTimestamp
@@ -43,4 +47,5 @@ public class DrinkModel {
     @ManyToOne(optional = false)
     @JoinColumn(name = "section_id", referencedColumnName = "id")
     private SectionModel section;
+
 }
