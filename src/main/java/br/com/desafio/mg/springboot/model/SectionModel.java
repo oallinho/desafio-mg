@@ -10,9 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.util.Date;
-import java.util.UUID;
 
 @Setter
 @Getter

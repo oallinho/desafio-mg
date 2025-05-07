@@ -1,13 +1,18 @@
 package br.com.desafio.mg.springboot.controller;
 
+import br.com.desafio.mg.springboot.dto.DrinkDTO;
+import br.com.desafio.mg.springboot.dto.request.DrinkRequest;
+import br.com.desafio.mg.springboot.enums.DrinkType;
+import br.com.desafio.mg.springboot.exceptions.drink.DrinkNotFoundException;
 import br.com.desafio.mg.springboot.model.DrinkModel;
 import br.com.desafio.mg.springboot.service.DrinkService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/drink")
@@ -21,25 +26,43 @@ public class DrinkController {
     }
 
     @GetMapping
-    public List<DrinkModel> getAllDrinks() {
-        return drinkService.getAllDrinks();
+    public ResponseEntity<List<DrinkDTO>> getAllDrinks() {
+        List<DrinkModel> drinks = drinkService.getAllDrinks();
+        List<DrinkDTO> response = drinks.stream().map(DrinkDTO::new).toList();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(("/drinks-by-section/{sectionId}"))
+    public ResponseEntity<List<DrinkDTO>> getDrinksBySectionId(@PathVariable Long sectionId) {
+        List<DrinkModel> drinks = drinkService.getDrinksBySection(sectionId);
+        List<DrinkDTO> response = drinks.stream().map(DrinkDTO::new).toList();
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public DrinkModel createDrink(@RequestBody DrinkModel drink) {
-        return drinkService.saveDrink(drink);
+    public ResponseEntity<DrinkModel> createDrink(@RequestBody DrinkRequest request) {
+        DrinkModel created = drinkService.createDrink(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DrinkModel> getDrinkById(@RequestBody Long id) {
-        return drinkService.getDrinkById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<DrinkModel> getDrinkById(@PathVariable Long id) {
+        return drinkService.getDrinkById(id).map(ResponseEntity::ok).orElseThrow(() -> new DrinkNotFoundException(id));
+
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDrink(@RequestBody Long id) {
+    public ResponseEntity<Void> deleteDrink(@PathVariable Long id) {
         drinkService.deleteDrink(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/volume-by-type")
+    public ResponseEntity<Map<DrinkType, Double>> getTotalVolumeByType() {
+        Map<DrinkType, Double> volumeMap = drinkService.getTotalVolumeByType();
+        return ResponseEntity.ok(volumeMap);
+    }
+
 }

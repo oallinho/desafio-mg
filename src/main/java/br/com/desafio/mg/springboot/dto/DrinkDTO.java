@@ -9,20 +9,25 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
+@Getter
+@Setter
+@AllArgsConstructor
 public class DrinkDTO {
 
-    public DrinkDTO(DrinkModel drink){
-        BeanUtils.copyProperties(drink, this);
+    private Long id;
+    private DrinkType type;
+    private Double liter;
+    private String name;
+    private Long stockId;
+
+    public DrinkDTO(DrinkModel drink) {
+        this.id = drink.getId();
+        this.type = drink.getType();
+        this.liter = drink.getLiter();
+        this.name = drink.getName();
+        this.stockId = drink.getSection().getStock().getId();
     }
 
-    private UUID id;
-
-    private DrinkType type;
-
-    private Double liter;
-
-    private OffsetDateTime createdAt;
-
-    private OffsetDateTime updatedAt;
-
+    public DrinkDTO(DrinkDTO drinkDTO) {
+    }
 }
