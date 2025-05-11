@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Setter
@@ -30,15 +31,15 @@ public class SectionModel {
     @Column(nullable = false)
     private Double maximumCapacity;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(nullable = false)
     @CreationTimestamp
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(nullable = false)
     @UpdateTimestamp
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "stock_id", referencedColumnName = "id")

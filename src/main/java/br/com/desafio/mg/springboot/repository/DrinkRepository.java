@@ -15,12 +15,15 @@ import java.util.UUID;
 public interface DrinkRepository extends JpaRepository<DrinkModel, Long> {
     List<DrinkModel> findByType(DrinkType type);
 
-    @Query("SELECT d.type, SUM(d.liter) FROM DrinkModel d GROUP BY d.type")
+    @Query("SELECT d.type, SUM(d.volume) FROM DrinkModel d GROUP BY d.type")
     List<Object[]> getTotalVolumeByType();
 
     @Query("SELECT d FROM DrinkModel d WHERE d.section.id = :sectionId")
     List<DrinkModel> getDrinksBySectionId(@Param("sectionId") Long sectionId);
 
-    @Query("SELECT d.section.id, SUM(d.liter) FROM DrinkModel d GROUP BY d.section.id")
+    @Query("SELECT d.section.id, SUM(d.volume) FROM DrinkModel d GROUP BY d.section.id")
     List<Object[]> getCurrentVolumesBySection();
+
+    @Query("SELECT SUM(d.volume) FROM DrinkModel d WHERE d.section.id = :sectionId")
+    Double getCurrentVolumeBySection(@Param("sectionId") Long sectionId);
 }

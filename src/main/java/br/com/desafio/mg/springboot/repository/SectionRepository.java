@@ -26,7 +26,7 @@ public interface SectionRepository extends JpaRepository<SectionModel, Long> {
                 LEFT JOIN DrinkModel d ON s.id = d.section.id\s
                 WHERE s.permittedType = :type
                 GROUP BY s\s
-                HAVING COALESCE(SUM(d.liter), 0) < s.maximumCapacity
+                HAVING COALESCE(SUM(d.volume), 0) < s.maximumCapacity
             """)
     List<SectionModel> findAvailableSectionsByType(@Param("type") DrinkType type);
 
