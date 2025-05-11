@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 public class DrinkRequest {
     private String name;
-    private Double liter;
+    private Double volume;
     private DrinkType type;
     private Long sectionId;
 }

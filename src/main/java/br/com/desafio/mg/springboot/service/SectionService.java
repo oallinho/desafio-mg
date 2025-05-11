@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SectionService {
@@ -88,48 +89,25 @@ public class SectionService {
         return sectionRepository.findById(id).orElseThrow(() -> new SectionNotFoundException(id));
     }
 
-    public List<SectionDTO> getAvailableSections() {
-        return getFilteredSections(null, null);
-    }
-
-    public List<SectionDTO> getAvailableSectionsByDrinkType(DrinkType type) {
-        return getFilteredSections(type, null);
-    }
-
-    public List<SectionDTO> getAvailableSectionsByTypeAndVolume(DrinkType type, double requiredVolume) {
-        return getFilteredSections(type, requiredVolume);
-    }
-
     public List<SectionDTO> getFilteredSections(DrinkType type, Double requiredVolume) {
-        Map<Long, Double> sectionVolumeMap = buildCurrentVolumeMap();
+        Map<Long, Double> sectionVolumeMap = drinkRepository.getCurrentVolumesBySection().stream()
+                .collect(Collectors.toMap(
+                        entry -> (Long) entry[0],
+                        entry -> (Double) entry[1]
+                ));
 
         List<SectionModel> sections = (type == null)
                 ? sectionRepository.findAll()
                 : sectionRepository.findByPermittedType(type);
 
-        return sections.stream()
-                .filter(section -> {
-                    double currentVolume = sectionVolumeMap.getOrDefault(section.getId(), 0.0);
-                    boolean hasSpace = currentVolume < section.getMaximumCapacity();
-                    boolean fitsVolume = requiredVolume == null ||
-                            (section.getMaximumCapacity() - currentVolume) >= requiredVolume;
-                    return hasSpace && fitsVolume;
-                })
-                .map(section -> {
-                    double currentVolume = sectionVolumeMap.getOrDefault(section.getId(), 0.0);
-                    return new SectionDTO(section, currentVolume);
-                })
-                .toList();
-    }
-
-    private Map<Long, Double> buildCurrentVolumeMap() {
-        List<Object[]> volumeData = drinkRepository.getCurrentVolumesBySection();
-        Map<Long, Double> sectionVolumeMap = new HashMap<>();
-
-        for (Object[] entry : volumeData) {
-            sectionVolumeMap.put((Long) entry[0], (Double) entry[1]);
-        }
-
-        return sectionVolumeMap;
+        return sections.stream().map(section -> {
+            double currentVolume = sectionVolumeMap.getOrDefault(section.getId(), 0.0);
+            return new AbstractMap.SimpleEntry<>(section, currentVolume);
+        }).filter(entry -> {
+            SectionModel section = entry.getKey();
+            double currentVolume = entry.getValue();
+            return currentVolume < section.getMaximumCapacity()
+                    && (requiredVolume == null || currentVolume + requiredVolume <= section.getMaximumCapacity());
+        }).map(entry -> new SectionDTO(entry.getKey(), entry.getValue())).toList();
     }
 }

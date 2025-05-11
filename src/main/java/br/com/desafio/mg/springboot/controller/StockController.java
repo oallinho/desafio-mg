@@ -58,39 +58,4 @@ public class StockController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateStock(@PathVariable Long id, @RequestBody StockRequest request) {
-        Optional<StockModel> optionalStock = stockService.getStockById(id);
-        if (optionalStock.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Stock not found.");
-        }
-
-        StockModel stock = optionalStock.get();
-
-        List<SectionModel> sections = sectionService.getSectionsByStockId(stock.getId());
-
-        for (SectionModel section : sections) {
-            double newLimit = section.getPermittedType() == DrinkType.ALCOHOLIC ? request.getAlcoholicMaximum() : request.getNonAlcoholicMaximum();
-
-            if (section.getMaximumCapacity() > newLimit) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Section " + section.getId() + " exceeds new " + section.getPermittedType().name().toLowerCase().replace("_", " ") + " limit.");
-            }
-        }
-
-        stock.setAlcoholicMaximum(request.getAlcoholicMaximum());
-        stock.setNonAlcoholicMaximum(request.getNonAlcoholicMaximum());
-        stock.setMaximumSections(request.getMaximumSections());
-        stockService.save(stock);
-
-        for (SectionModel section : sections) {
-            if (section.getPermittedType() == DrinkType.ALCOHOLIC) {
-                section.setMaximumCapacity(request.getAlcoholicMaximum());
-            } else {
-                section.setMaximumCapacity(request.getNonAlcoholicMaximum());
-            }
-        }
-        sectionService.saveAll(sections);
-
-        return ResponseEntity.ok("Stock updated successfully.");
-    }
 }
