@@ -2,8 +2,10 @@ package br.com.desafio.mg.springboot.exceptions;
 
 import br.com.desafio.mg.springboot.enums.DrinkType;
 import br.com.desafio.mg.springboot.exceptions.drink.DivergentDrinkTypeException;
+import br.com.desafio.mg.springboot.exceptions.drink.DrinkAlreadySoldException;
 import br.com.desafio.mg.springboot.exceptions.drink.DrinkNotFoundException;
 import br.com.desafio.mg.springboot.exceptions.section.MaximumSectionsException;
+import br.com.desafio.mg.springboot.exceptions.section.SectionCapacityExceededException;
 import br.com.desafio.mg.springboot.exceptions.section.SectionNotFoundException;
 import br.com.desafio.mg.springboot.exceptions.stock.StockNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -53,5 +55,16 @@ public class GlobalExceptionHandler {
                 .body(buildError(HttpStatus.BAD_REQUEST, ex.getMessage()));
     }
 
+    @ExceptionHandler(SectionCapacityExceededException.class)
+    public ResponseEntity<ErrorDetails> handleSectionCapacityExceeded(SectionCapacityExceededException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(buildError(HttpStatus.BAD_REQUEST, ex.getMessage()));
+    }
+
+    @ExceptionHandler(DrinkAlreadySoldException.class)
+    public ResponseEntity<ErrorDetails> handleSectionCapacityExceeded(DrinkAlreadySoldException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(buildError(HttpStatus.BAD_REQUEST, ex.getMessage()));
+    }
 }
 
