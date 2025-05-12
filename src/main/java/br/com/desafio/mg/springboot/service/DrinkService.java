@@ -3,19 +3,18 @@ package br.com.desafio.mg.springboot.service;
 import br.com.desafio.mg.springboot.dto.request.DrinkRequest;
 import br.com.desafio.mg.springboot.enums.DrinkStatus;
 import br.com.desafio.mg.springboot.enums.DrinkType;
+import br.com.desafio.mg.springboot.enums.TransactionType;
 import br.com.desafio.mg.springboot.exceptions.drink.DivergentDrinkTypeException;
 import br.com.desafio.mg.springboot.exceptions.drink.DrinkAlreadySoldException;
 import br.com.desafio.mg.springboot.exceptions.drink.DrinkNotFoundException;
-import br.com.desafio.mg.springboot.exceptions.section.SectionCapacityExceededException;
 import br.com.desafio.mg.springboot.exceptions.section.SectionNotFoundException;
-import br.com.desafio.mg.springboot.listener.DrinkEvent;
+import br.com.desafio.mg.springboot.listener.TransactionEvent;
 import br.com.desafio.mg.springboot.model.DrinkModel;
 import br.com.desafio.mg.springboot.model.SectionModel;
 import br.com.desafio.mg.springboot.repository.DrinkRepository;
 import br.com.desafio.mg.springboot.repository.SectionRepository;
 import br.com.desafio.mg.springboot.validator.SectionValidator;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +39,6 @@ public class DrinkService {
         this.sectionService = sectionService;
         this.sectionRepository = sectionRepository;
         this.sectionValidator = sectionValidator;
-
         this.eventPublisher = eventPublisher;
     }
 
@@ -72,7 +70,7 @@ public class DrinkService {
 
         drink = drinkRepository.save(drink);
 
-        eventPublisher.publishEvent(new DrinkEvent(this, drink.getId(), section.getId()));
+        eventPublisher.publishEvent(new TransactionEvent(this, drink.getId(), section.getId(), "allan.paiva", TransactionType.ENTRY));
 
         return drink;
     }
@@ -101,7 +99,7 @@ public class DrinkService {
         if (drink.getStatus() == DrinkStatus.SOLD)
             throw new DrinkAlreadySoldException(drinkId);
 
-        eventPublisher.publishEvent(new DrinkEvent(this, drink.getId(), drink.getSection().getId()));
+        eventPublisher.publishEvent(new TransactionEvent(this, drink.getId(), drink.getSection().getId(), "allan.paiva", TransactionType.EXIT));
 
         drink.setSection(null);
         drink.setUpdatedAt(LocalDateTime.now());
