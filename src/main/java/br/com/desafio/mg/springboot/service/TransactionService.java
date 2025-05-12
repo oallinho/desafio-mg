@@ -33,9 +33,11 @@ public class TransactionService {
     }
 
     public TransactionDTO registerTransaction(Long drinkId, Long sectionId, String responsible, TransactionType type) {
-        DrinkModel drink = drinkRepository.findById(drinkId).orElseThrow(() -> new DrinkNotFoundException(drinkId));
+        DrinkModel drink = drinkRepository.findById(drinkId)
+                .orElseThrow(() -> new DrinkNotFoundException(drinkId));
 
-        SectionModel section = sectionRepository.findById(sectionId).orElseThrow(() -> new SectionNotFoundException(sectionId));
+        SectionModel section = sectionRepository.findById(sectionId)
+                .orElseThrow(() -> new SectionNotFoundException(sectionId));
 
         TransactionModel transaction = new TransactionModel();
         transaction.setDrink(drink);
@@ -55,9 +57,11 @@ public class TransactionService {
         Long drinkId = request.getIdDrink();
         Long newSectionId = request.getNewSectionId();
 
-        DrinkModel drink = drinkRepository.findById(drinkId).orElseThrow(() -> new DrinkNotFoundException(drinkId));
+        DrinkModel drink = drinkRepository.findById(drinkId)
+                .orElseThrow(() -> new DrinkNotFoundException(drinkId));
 
-        SectionModel section = sectionRepository.findById(newSectionId).orElseThrow(() -> new SectionNotFoundException(newSectionId));
+        SectionModel section = sectionRepository.findById(newSectionId)
+                .orElseThrow(() -> new SectionNotFoundException(newSectionId));
 
         drinkService.updateDrink(drinkId, newSectionId);
 
@@ -66,7 +70,8 @@ public class TransactionService {
 
 
     public List<TransactionDTO> findTransactions(TransactionType type, String responsible) {
-        List<TransactionModel> transactions = transactionRepository.findWithFiltersWithoutDates(type, responsible);
+        List<TransactionModel> transactions = transactionRepository
+                .findWithFiltersWithoutDates(type, responsible);
         return transactions.stream().map(this::toDTO).toList();
     }
 

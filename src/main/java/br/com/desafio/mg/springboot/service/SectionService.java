@@ -34,7 +34,8 @@ public class SectionService {
     }
 
     public SectionModel createSection(SectionRequest request) {
-        StockModel stock = stockService.getStockById(request.getStockId()).orElseThrow(() -> new StockNotFoundException(request.getStockId()));
+        StockModel stock = stockService.getStockById(request.getStockId())
+                .orElseThrow(() -> new StockNotFoundException(request.getStockId()));
 
         long currentSections = sectionRepository.countByStockId(stock.getId());
         if (currentSections >= stock.getMaximumSections()) {

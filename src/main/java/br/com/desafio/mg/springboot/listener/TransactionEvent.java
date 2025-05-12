@@ -8,18 +8,19 @@ import org.springframework.context.ApplicationEvent;
 
 @Getter
 @Setter
-public class DrinkEvent extends ApplicationEvent {
-    private Long drinkId;
-    private Long sectionId;
-    private String responsible;
-    private TransactionType type;
+public class TransactionEvent extends ApplicationEvent {
+    private final Long drinkId;
+    private final Long sectionId;
+    private final String responsible;
+    private final TransactionType type;
 
-    public DrinkEvent(Object source, Long drinkId, Long sectionId) {
+    public TransactionEvent(Object source, Long drinkId, Long sectionId, String responsible, TransactionType type) {
         super(source);
         this.drinkId = drinkId;
         this.sectionId = sectionId;
         this.responsible = responsible;
         this.type = type;
     }
-
 }
+
+
