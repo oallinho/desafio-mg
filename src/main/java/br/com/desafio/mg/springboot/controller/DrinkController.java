@@ -47,6 +47,12 @@ public class DrinkController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
+    @PutMapping("/{drinkId}/sell")
+    public ResponseEntity<Void> sellDrink(@PathVariable Long drinkId) {
+        drinkService.sellDrink(drinkId);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<DrinkModel> getDrinkById(@PathVariable Long id) {
         return drinkService.getDrinkById(id).map(ResponseEntity::ok).orElseThrow(() -> new DrinkNotFoundException(id));

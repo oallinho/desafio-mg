@@ -1,5 +1,8 @@
 package br.com.desafio.mg.springboot.validator;
 
+import br.com.desafio.mg.springboot.enums.DrinkType;
+import br.com.desafio.mg.springboot.exceptions.drink.DivergentDrinkTypeException;
+import br.com.desafio.mg.springboot.exceptions.section.SectionCapacityExceededException;
 import br.com.desafio.mg.springboot.model.SectionModel;
 import br.com.desafio.mg.springboot.repository.DrinkRepository;
 import org.springframework.stereotype.Component;
@@ -9,17 +12,25 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
-public class SectionCapacityValidator {
+public class SectionValidator {
     private final DrinkRepository drinkRepository;
 
-    public SectionCapacityValidator(DrinkRepository drinkRepository) {
+    public SectionValidator(DrinkRepository drinkRepository) {
         this.drinkRepository = drinkRepository;
     }
 
-    public boolean hasCapacity(SectionModel section, double requiredVolume) {
+    public void validateDrinkType(SectionModel section, DrinkType type) {
+        if (type != section.getPermittedType()) {
+            throw new DivergentDrinkTypeException(section.getPermittedType());
+        }
+    }
+
+    public void validateSectionCapacity(SectionModel section, double requiredVolume) {
         Map<Long, Double> sectionVolumeMap = buildCurrentVolumeMap();
         double currentVolume = sectionVolumeMap.getOrDefault(section.getId(), 0.0);
-        return (currentVolume + requiredVolume) <= section.getMaximumCapacity();
+        if (currentVolume + requiredVolume > section.getMaximumCapacity()) {
+            throw new SectionCapacityExceededException(section.getId());
+        }
     }
 
     private Map<Long, Double> buildCurrentVolumeMap() {

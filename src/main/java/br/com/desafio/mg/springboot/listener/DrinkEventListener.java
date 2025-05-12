@@ -19,14 +19,12 @@ public class DrinkEventListener implements ApplicationListener<DrinkEvent> {
 
     @Override
     public void onApplicationEvent(DrinkEvent event) {
-        // Obter a seção do drink
         SectionModel section = sectionService.getSectionById(event.getSectionId());
 
-        // Registrar a transação do tipo ENTRY
         transactionService.registerTransaction(
                 event.getDrinkId(),
                 section.getId(),
-                "allan.paiva", // Você pode ajustar o responsável conforme necessário
+                "allan.paiva",
                 TransactionType.ENTRY
         );
     }

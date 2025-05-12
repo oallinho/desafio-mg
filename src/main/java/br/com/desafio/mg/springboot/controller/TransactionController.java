@@ -28,20 +28,18 @@ public class TransactionController {
     }
 
     @GetMapping("/get-all")
-    public ResponseEntity<List<TransactionDTO>> getTransactions(
-            @RequestParam(required = false) TransactionType type,
-            @RequestParam(required = false) String responsible,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
-        List<TransactionDTO> transactions = transactionService
-                .findTransactions(type, responsible, startDate, endDate);
+    public ResponseEntity<List<TransactionDTO>> getTransactionsWithoutDates(
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String responsible) {
+
+        TransactionType transactionType = (type != null) ? TransactionType.valueOf(type) : null;
+
+        List<TransactionDTO> transactions = transactionService.findTransactions(transactionType, responsible);
         return ResponseEntity.ok(transactions);
     }
 
     @PostMapping("/transfer")
-    public TransactionModel transferDrink(@RequestBody DrinkTransferRequest drink) {
+    public TransactionDTO transferDrink(@RequestBody DrinkTransferRequest drink) {
         return transactionService.transferDrink(drink);
     }
 

@@ -25,26 +25,17 @@ public class TransactionService {
     private final SectionRepository sectionRepository;
     private final DrinkService drinkService;
 
-    public TransactionService(
-            TransactionRepository transactionRepository,
-            DrinkRepository drinkRepository,
-            SectionRepository sectionRepository, StockRepository stockRepository, DrinkService drinkService) {
+    public TransactionService(TransactionRepository transactionRepository, DrinkRepository drinkRepository, SectionRepository sectionRepository, StockRepository stockRepository, DrinkService drinkService) {
         this.transactionRepository = transactionRepository;
         this.drinkRepository = drinkRepository;
         this.sectionRepository = sectionRepository;
         this.drinkService = drinkService;
     }
 
-    public TransactionModel registerTransaction(
-            Long drinkId,
-            Long sectionId,
-            String responsible,
-            TransactionType type) {
-        DrinkModel drink = drinkRepository.findById(drinkId)
-                .orElseThrow(() -> new DrinkNotFoundException(drinkId));
+    public TransactionDTO registerTransaction(Long drinkId, Long sectionId, String responsible, TransactionType type) {
+        DrinkModel drink = drinkRepository.findById(drinkId).orElseThrow(() -> new DrinkNotFoundException(drinkId));
 
-        SectionModel section = sectionRepository.findById(sectionId)
-                .orElseThrow(() -> new SectionNotFoundException(sectionId));
+        SectionModel section = sectionRepository.findById(sectionId).orElseThrow(() -> new SectionNotFoundException(sectionId));
 
         TransactionModel transaction = new TransactionModel();
         transaction.setDrink(drink);
@@ -55,32 +46,31 @@ public class TransactionService {
         transaction.setType(type);
         transaction.setCreatedAt(LocalDateTime.now());
 
-        return transactionRepository.save(transaction);
+        TransactionModel saved = transactionRepository.save(transaction);
+
+        return toDTO(saved);
     }
 
-    public TransactionModel transferDrink(DrinkTransferRequest request) {
+    public TransactionDTO transferDrink(DrinkTransferRequest request) {
         Long drinkId = request.getIdDrink();
         Long newSectionId = request.getNewSectionId();
 
-        DrinkModel drink = drinkRepository.findById(drinkId)
-                .orElseThrow(() -> new DrinkNotFoundException(drinkId));
+        DrinkModel drink = drinkRepository.findById(drinkId).orElseThrow(() -> new DrinkNotFoundException(drinkId));
 
-        SectionModel section = sectionRepository.findById(newSectionId)
-                .orElseThrow(() -> new SectionNotFoundException(newSectionId));
+        SectionModel section = sectionRepository.findById(newSectionId).orElseThrow(() -> new SectionNotFoundException(newSectionId));
 
         drinkService.updateDrink(drinkId, newSectionId);
 
-        return registerTransaction(
-                drinkId,
-                newSectionId,
-                "allan.paiva",
-                TransactionType.valueOf("TRANSFER"));
+        return registerTransaction(drinkId, newSectionId, "allan.paiva", TransactionType.valueOf("TRANSFER"));
     }
 
 
-    public List<TransactionDTO> findTransactions(TransactionType type, String responsible, LocalDateTime start, LocalDateTime end) {
-        List<TransactionModel> transactions = transactionRepository
-                .findWithFilters(type, responsible, start, end);
-        return transactions.stream().map(TransactionDTO::new).toList();
+    public List<TransactionDTO> findTransactions(TransactionType type, String responsible) {
+        List<TransactionModel> transactions = transactionRepository.findWithFiltersWithoutDates(type, responsible);
+        return transactions.stream().map(this::toDTO).toList();
+    }
+
+    private TransactionDTO toDTO(TransactionModel transaction) {
+        return new TransactionDTO(transaction);
     }
 }
