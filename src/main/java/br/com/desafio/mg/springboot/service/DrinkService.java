@@ -76,7 +76,7 @@ public class DrinkService {
     }
 
     public void updateDrink(Long drinkId, Long newSectionId) {
-        DrinkModel drink = drinkRepository.findById(drinkId).orElseThrow(() -> new DrinkNotFoundException(drinkId));
+        DrinkModel drink = findDrinkOrThrow(drinkId);
 
         SectionModel newSection = sectionRepository.findById(newSectionId).orElseThrow(() -> new SectionNotFoundException(newSectionId));
 
@@ -94,19 +94,21 @@ public class DrinkService {
     }
 
     public void sellDrink(Long drinkId){
-        DrinkModel drink = drinkRepository.findById(drinkId).orElseThrow(() -> new DrinkNotFoundException(drinkId));
+        DrinkModel drink = findDrinkOrThrow(drinkId);
 
         if (drink.getStatus() == DrinkStatus.SOLD)
             throw new DrinkAlreadySoldException(drinkId);
 
-        eventPublisher.publishEvent(new TransactionEvent(this, drink.getId(), drink.getSection().getId(), "allan.paiva", TransactionType.EXIT));
+        eventPublisher.publishEvent(new TransactionEvent(this,
+                drink.getId(),
+                drink.getSection().getId(),
+                "allan.paiva",
+                TransactionType.EXIT));
 
         drink.setSection(null);
         drink.setUpdatedAt(LocalDateTime.now());
         drink.setStatus(DrinkStatus.SOLD);
-        drink = drinkRepository.save(drink);
-
-
+        drinkRepository.save(drink);
     }
 
     public void deleteDrink(Long id) {
@@ -127,7 +129,6 @@ public class DrinkService {
             Double totalVolume = (Double) result[1];
             volumeMap.put(type, totalVolume);
         }
-
         return volumeMap;
     }
 }

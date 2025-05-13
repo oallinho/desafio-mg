@@ -53,7 +53,7 @@ public class TransactionService {
         return toDTO(saved);
     }
 
-    public TransactionDTO transferDrink(DrinkTransferRequest request) {
+    public TransactionDTO transferDrink(DrinkTransferRequest request, String responsible) {
         Long drinkId = request.getIdDrink();
         Long newSectionId = request.getNewSectionId();
 
@@ -65,7 +65,7 @@ public class TransactionService {
 
         drinkService.updateDrink(drinkId, newSectionId);
 
-        return registerTransaction(drinkId, newSectionId, "allan.paiva", TransactionType.valueOf("TRANSFER"));
+        return registerTransaction(drinkId, newSectionId, "allan.paiva", TransactionType.TRANSFER);
     }
 
 

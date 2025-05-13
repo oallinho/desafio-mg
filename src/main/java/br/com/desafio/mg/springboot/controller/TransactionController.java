@@ -1,20 +1,15 @@
 package br.com.desafio.mg.springboot.controller;
 
-import br.com.desafio.mg.springboot.dto.DrinkDTO;
 import br.com.desafio.mg.springboot.dto.TransactionDTO;
-import br.com.desafio.mg.springboot.dto.request.DrinkRequest;
 import br.com.desafio.mg.springboot.dto.request.DrinkTransferRequest;
-import br.com.desafio.mg.springboot.dto.request.TransactionRequest;
 import br.com.desafio.mg.springboot.enums.TransactionType;
-import br.com.desafio.mg.springboot.model.DrinkModel;
-import br.com.desafio.mg.springboot.model.TransactionModel;
-import br.com.desafio.mg.springboot.repository.DrinkRepository;
+import br.com.desafio.mg.springboot.security.CustomUserDetails;
 import br.com.desafio.mg.springboot.service.TransactionService;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -28,19 +23,22 @@ public class TransactionController {
     }
 
     @GetMapping("/get-all")
-    public ResponseEntity<List<TransactionDTO>> getTransactionsWithoutDates(
+    public ResponseEntity<List<TransactionDTO>> getTransactions(
             @RequestParam(required = false) String type,
-            @RequestParam(required = false) String responsible) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         TransactionType transactionType = (type != null) ? TransactionType.valueOf(type) : null;
+        String responsible = userDetails.getUsername();
 
         List<TransactionDTO> transactions = transactionService.findTransactions(transactionType, responsible);
         return ResponseEntity.ok(transactions);
     }
 
     @PostMapping("/transfer")
-    public TransactionDTO transferDrink(@RequestBody DrinkTransferRequest drink) {
-        return transactionService.transferDrink(drink);
+    public TransactionDTO transferDrink(
+            @RequestBody DrinkTransferRequest drink,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return transactionService.transferDrink(drink, userDetails.getUsername());
     }
 
 }
