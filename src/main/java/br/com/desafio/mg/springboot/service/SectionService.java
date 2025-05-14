@@ -86,7 +86,7 @@ public class SectionService {
         sectionRepository.saveAll(sections);
     }
 
-    private SectionModel findSectionOrThrow(Long id) {
+    public SectionModel findSectionOrThrow(Long id) {
         return sectionRepository.findById(id).orElseThrow(() -> new SectionNotFoundException(id));
     }
 
