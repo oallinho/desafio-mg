@@ -1,13 +1,11 @@
 package br.com.desafio.mg.springboot.repository;
 
-import br.com.desafio.mg.springboot.dto.TransactionDTO;
 import br.com.desafio.mg.springboot.enums.TransactionType;
 import br.com.desafio.mg.springboot.model.TransactionModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TransactionRepository extends JpaRepository<TransactionModel, Long> {

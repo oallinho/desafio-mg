@@ -1,33 +1,39 @@
 package br.com.desafio.mg.springboot.dto;
 
 import br.com.desafio.mg.springboot.model.StockModel;
-import jakarta.persistence.Column;
-import lombok.*;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.time.OffsetDateTime;
-import java.util.UUID;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 public class StockDTO {
 
     private Long id;
 
-    private int maximumSections;
+    @NotNull
+    private Integer maximumSections;
 
-    private double alcoholicMaximum;
+    @NotNull
+    private Double alcoholicMaximum;
 
-    private double nonAlcoholicMaximum;
+    @NotNull
+    private Double nonAlcoholicMaximum;
 
-    public StockDTO (StockModel stock){
+    public StockDTO() {}
+
+    public StockDTO(StockModel stock) {
         this.id = stock.getId();
         this.maximumSections = stock.getMaximumSections();
         this.alcoholicMaximum = stock.getAlcoholicMaximum();
         this.nonAlcoholicMaximum = stock.getNonAlcoholicMaximum();
-
     }
 
+    public StockModel toModel() {
+        StockModel stock = new StockModel(this.id);
+        stock.setMaximumSections(this.maximumSections);
+        stock.setAlcoholicMaximum(this.alcoholicMaximum);
+        stock.setNonAlcoholicMaximum(this.nonAlcoholicMaximum);
+        return stock;
+    }
 }

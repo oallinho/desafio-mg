@@ -1,23 +1,16 @@
 package br.com.desafio.mg.springboot.controller;
 
-import br.com.desafio.mg.springboot.dto.DrinkDTO;
 import br.com.desafio.mg.springboot.dto.StockDTO;
-import br.com.desafio.mg.springboot.dto.request.StockRequest;
-import br.com.desafio.mg.springboot.enums.DrinkType;
-import br.com.desafio.mg.springboot.model.DrinkModel;
-import br.com.desafio.mg.springboot.model.SectionModel;
 import br.com.desafio.mg.springboot.model.StockModel;
-import br.com.desafio.mg.springboot.security.CustomUserDetails;
+import br.com.desafio.mg.springboot.security.user.CustomUserDetails;
 import br.com.desafio.mg.springboot.service.SectionService;
 import br.com.desafio.mg.springboot.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/stock")
@@ -33,7 +26,8 @@ public class StockController {
     }
 
     @GetMapping
-    public ResponseEntity<List<StockDTO>> getAllStocks(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<List<StockDTO>> getAllStocks(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         List<StockModel> stock = stockService.getAllStocks();
         List<StockDTO> response = stock.stream()
                 .map(StockDTO::new)
@@ -45,15 +39,16 @@ public class StockController {
 
 
     @PostMapping
-    public StockModel createStock(@RequestBody StockModel stock,
+    public StockDTO createStock(@RequestBody StockDTO stock,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         return stockService.save(stock);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<StockModel> getStockById(@PathVariable Long id,
+    public ResponseEntity<StockDTO> getStockById(@PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        return stockService.getStockById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        StockDTO stock = stockService.getStockById(id);
+        return ResponseEntity.ok(stock);
     }
 
     @DeleteMapping("/{id}")

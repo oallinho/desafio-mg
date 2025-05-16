@@ -1,10 +1,9 @@
 package br.com.desafio.mg.springboot.controller;
 
 import br.com.desafio.mg.springboot.dto.SectionDTO;
-import br.com.desafio.mg.springboot.dto.request.SectionRequest;
 import br.com.desafio.mg.springboot.enums.DrinkType;
 import br.com.desafio.mg.springboot.model.SectionModel;
-import br.com.desafio.mg.springboot.security.CustomUserDetails;
+import br.com.desafio.mg.springboot.security.user.CustomUserDetails;
 import br.com.desafio.mg.springboot.service.SectionService;
 import br.com.desafio.mg.springboot.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +31,9 @@ public class SectionController {
     }
 
     @PostMapping
-    public ResponseEntity<SectionModel> createSection(@RequestBody SectionRequest request,
+    public ResponseEntity<SectionDTO> createSection(@RequestBody SectionDTO request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        SectionModel created = sectionService.createSection(request);
+        SectionDTO created = sectionService.createSection(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 

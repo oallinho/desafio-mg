@@ -1,5 +1,6 @@
 package br.com.desafio.mg.springboot.model;
 
+import br.com.desafio.mg.springboot.dto.SectionDTO;
 import br.com.desafio.mg.springboot.enums.DrinkType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
@@ -44,4 +45,10 @@ public class SectionModel {
     @ManyToOne(optional = false)
     @JoinColumn(name = "stock_id", referencedColumnName = "id")
     private StockModel stock;
+
+    public SectionModel(SectionDTO dto) {
+        this.permittedType = dto.getPermittedType();
+        this.maximumCapacity = dto.getMaximumCapacity();
+        this.stock = new StockModel(dto.getStockId());
+    }
 }

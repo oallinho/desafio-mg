@@ -1,7 +1,7 @@
 package br.com.desafio.mg.springboot.service;
 
 import br.com.desafio.mg.springboot.dto.TransactionDTO;
-import br.com.desafio.mg.springboot.dto.request.DrinkTransferRequest;
+import br.com.desafio.mg.springboot.dto.DrinkTransferDTO;
 import br.com.desafio.mg.springboot.enums.TransactionType;
 import br.com.desafio.mg.springboot.exceptions.drink.DrinkNotFoundException;
 import br.com.desafio.mg.springboot.exceptions.section.SectionNotFoundException;
@@ -53,7 +53,7 @@ public class TransactionService {
         return toDTO(saved);
     }
 
-    public TransactionDTO transferDrink(DrinkTransferRequest request, String responsible) {
+    public TransactionDTO transferDrink(DrinkTransferDTO request, String responsible) {
         Long drinkId = request.getIdDrink();
         Long newSectionId = request.getNewSectionId();
 

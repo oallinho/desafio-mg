@@ -3,7 +3,6 @@ package br.com.desafio.mg.springboot.dto;
 import br.com.desafio.mg.springboot.enums.TransactionType;
 import br.com.desafio.mg.springboot.model.TransactionModel;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
