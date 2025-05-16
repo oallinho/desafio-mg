@@ -8,16 +8,11 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.util.Date;
-import java.util.UUID;
 
 @Setter
 @Getter
 @Entity
-@RequiredArgsConstructor
 @Table(name = "stock")
 public class StockModel {
 
@@ -43,4 +38,9 @@ public class StockModel {
     @Column(nullable = false)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
+
+    public StockModel() {}
+    public StockModel(Long id) {
+        this.id = id;
+    }
 }

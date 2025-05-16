@@ -1,4 +1,4 @@
-package br.com.desafio.mg.springboot.security;
+package br.com.desafio.mg.springboot.security.user;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 

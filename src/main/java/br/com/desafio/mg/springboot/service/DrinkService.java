@@ -1,6 +1,6 @@
 package br.com.desafio.mg.springboot.service;
 
-import br.com.desafio.mg.springboot.dto.request.DrinkRequest;
+import br.com.desafio.mg.springboot.dto.DrinkDTO;
 import br.com.desafio.mg.springboot.enums.DrinkStatus;
 import br.com.desafio.mg.springboot.enums.DrinkType;
 import br.com.desafio.mg.springboot.enums.TransactionType;
@@ -46,8 +46,9 @@ public class DrinkService {
         return drinkRepository.findAll();
     }
 
-    public Optional<DrinkModel> getDrinkById(Long id) {
-        return drinkRepository.findById(id);
+    public Optional<DrinkDTO> getDrinkById(Long id) {
+        return drinkRepository.findById(id)
+                .map(DrinkDTO::new);
     }
 
     public List<DrinkModel> getDrinksBySection(Long sectionId) {
@@ -55,13 +56,13 @@ public class DrinkService {
         return drinkRepository.getDrinksBySectionId(sectionId);
     }
 
-    public DrinkModel createDrink(DrinkRequest request) {
+    public DrinkDTO createDrink(DrinkDTO request) {
         SectionModel section = sectionService.getSectionById(request.getSectionId());
 
         sectionValidator.validateDrinkType(section, request.getType());
         sectionValidator.validateSectionCapacity(section, request.getVolume());
 
-        DrinkModel drink = new DrinkModel();
+        DrinkModel drink = request.toModel(section);
         drink.setName(request.getName());
         drink.setVolume(request.getVolume());
         drink.setType(request.getType());
@@ -72,7 +73,7 @@ public class DrinkService {
 
         eventPublisher.publishEvent(new TransactionEvent(this, drink.getId(), section.getId(), "allan.paiva", TransactionType.ENTRY));
 
-        return drink;
+        return new DrinkDTO(drink);
     }
 
     public void updateDrink(Long drinkId, Long newSectionId) {

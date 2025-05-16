@@ -1,12 +1,10 @@
 package br.com.desafio.mg.springboot.service;
 
 import br.com.desafio.mg.springboot.dto.SectionDTO;
-import br.com.desafio.mg.springboot.dto.request.SectionRequest;
 import br.com.desafio.mg.springboot.enums.DrinkType;
 import br.com.desafio.mg.springboot.exceptions.drink.InvalidDrinkTypeException;
 import br.com.desafio.mg.springboot.exceptions.section.MaximumSectionsException;
 import br.com.desafio.mg.springboot.exceptions.section.SectionNotFoundException;
-import br.com.desafio.mg.springboot.exceptions.stock.StockNotFoundException;
 import br.com.desafio.mg.springboot.model.SectionModel;
 import br.com.desafio.mg.springboot.model.StockModel;
 import br.com.desafio.mg.springboot.repository.DrinkRepository;
@@ -33,16 +31,15 @@ public class SectionService {
         this.drinkRepository = drinkRepository;
     }
 
-    public SectionModel createSection(SectionRequest request) {
-        StockModel stock = stockService.getStockById(request.getStockId())
-                .orElseThrow(() -> new StockNotFoundException(request.getStockId()));
+    public SectionDTO createSection(SectionDTO dto) {
+        StockModel stock = stockService.findStockOrThrow(dto.getStockId());
 
         long currentSections = sectionRepository.countByStockId(stock.getId());
         if (currentSections >= stock.getMaximumSections()) {
             throw new MaximumSectionsException("Maximum number of sections reached");
         }
 
-        DrinkType permittedType = request.getPermittedType();
+        DrinkType permittedType = dto.getPermittedType();
         if (Objects.isNull(permittedType)) {
             List<String> validTypes = Arrays.stream(DrinkType.values()).map(Enum::name).toList();
             throw new InvalidDrinkTypeException("null", validTypes);
@@ -58,7 +55,8 @@ public class SectionService {
         section.setMaximumCapacity(capacity);
         section.setStock(stock);
 
-        return sectionRepository.save(section);
+        SectionModel saved = sectionRepository.save(section);
+        return new SectionDTO(saved);
     }
 
     public List<SectionModel> getAllSections() {

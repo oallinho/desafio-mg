@@ -1,11 +1,10 @@
 package br.com.desafio.mg.springboot.controller;
 
 import br.com.desafio.mg.springboot.dto.DrinkDTO;
-import br.com.desafio.mg.springboot.dto.request.DrinkRequest;
 import br.com.desafio.mg.springboot.enums.DrinkType;
 import br.com.desafio.mg.springboot.exceptions.drink.DrinkNotFoundException;
 import br.com.desafio.mg.springboot.model.DrinkModel;
-import br.com.desafio.mg.springboot.security.CustomUserDetails;
+import br.com.desafio.mg.springboot.security.user.CustomUserDetails;
 import br.com.desafio.mg.springboot.service.DrinkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,9 +44,9 @@ public class DrinkController {
     }
 
     @PostMapping
-    public ResponseEntity<DrinkModel> createDrink(@RequestBody DrinkRequest request,
+    public ResponseEntity<DrinkDTO> createDrink(@RequestBody DrinkDTO request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        DrinkModel created = drinkService.createDrink(request);
+        DrinkDTO created = drinkService.createDrink(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
@@ -59,7 +58,7 @@ public class DrinkController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DrinkModel> getDrinkById(@PathVariable Long id,
+    public ResponseEntity<DrinkDTO> getDrinkById(@PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         return drinkService.getDrinkById(id).map(ResponseEntity::ok).orElseThrow(() -> new DrinkNotFoundException(id));
 

@@ -1,11 +1,12 @@
 package br.com.desafio.mg.springboot.service;
 
+import br.com.desafio.mg.springboot.dto.StockDTO;
+import br.com.desafio.mg.springboot.exceptions.stock.StockNotFoundException;
 import br.com.desafio.mg.springboot.model.StockModel;
 import br.com.desafio.mg.springboot.repository.StockRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class StockService {
@@ -21,15 +22,26 @@ public class StockService {
         return stockRepository.findAll();
     }
 
-    public Optional<StockModel> getStockById(Long id) {
-        return stockRepository.findById(id);
+    public StockDTO getStockById(Long id) {
+        StockModel stockModel = findStockOrThrow(id);
+
+        return new StockDTO(stockModel);
     }
 
-    public StockModel save(StockModel stock) {
-        return stockRepository.save(stock);
+    public StockDTO save(StockDTO stock) {
+        StockModel stockModel = stock.toModel();
+
+        StockModel savedStock = stockRepository.save(stockModel);
+
+        return new StockDTO(savedStock);
     }
 
     public void deleteStock(Long id) {
-        stockRepository.deleteById(id);
+        StockModel stock = findStockOrThrow(id);
+        stockRepository.delete(stock);
+    }
+
+    StockModel findStockOrThrow(Long id) {
+        return stockRepository.findById(id).orElseThrow(() -> new StockNotFoundException(id));
     }
 }

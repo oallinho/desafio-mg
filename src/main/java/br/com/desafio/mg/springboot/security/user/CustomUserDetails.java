@@ -1,8 +1,6 @@
-package br.com.desafio.mg.springboot.security;
+package br.com.desafio.mg.springboot.security.user;
 
 import br.com.desafio.mg.springboot.model.UserModel;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

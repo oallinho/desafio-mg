@@ -1,11 +1,11 @@
-package br.com.desafio.mg.springboot.dto.request;
+package br.com.desafio.mg.springboot.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class DrinkTransferRequest {
+public class DrinkTransferDTO {
     private Long idDrink;
     private Long newSectionId;
 }

@@ -1,7 +1,6 @@
 package br.com.desafio.mg.springboot.controller;
 
-import br.com.desafio.mg.springboot.dto.request.AuthRequest;
-import br.com.desafio.mg.springboot.dto.response.AuthResponse;
+import br.com.desafio.mg.springboot.dto.AuthDTO;
 import br.com.desafio.mg.springboot.security.jwt.JwtTokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -30,27 +29,27 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
-        log.info("Tentativa de login para o usuário: {}", request.getUsername());
+    public ResponseEntity<?> login(@RequestBody AuthDTO request) {
+        log.info("Login attempt for user: {}", request.getUsername());
 
         var auth = new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
         try {
             Authentication authentication = authManager.authenticate(auth);
 
             if (authentication.isAuthenticated()) {
-                log.info("Usuário {} autenticado com sucesso.", request.getUsername());
+                log.info("User {} successfully authenticated.", request.getUsername());
                 String token = jwtTokenUtil.generateToken(authentication.getName());
-                return ResponseEntity.ok(new AuthResponse(token));
+                return ResponseEntity.ok(new AuthDTO(token));
             } else {
-                log.warn("Falha na autenticação para o usuário: {}. Detalhes: {}", request.getUsername(), authentication);
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas.");
+                log.warn("Authentication failed for user: {}. Details: {}", request.getUsername(), authentication);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials.");
             }
         } catch (BadCredentialsException e) {
-            log.warn("Falha na autenticação para o usuário: {}. Credenciais inválidas.", request.getUsername());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas.");
+            log.warn("Authentication failed for user: {}. Invalid credentials.", request.getUsername());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials.");
         } catch (AuthenticationException e) {
-            log.error("Erro durante a autenticação para o usuário: {}", request.getUsername(), e);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erro na autenticação.");
+            log.error("Error during authentication for user: {}", request.getUsername(), e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication error.");
         }
     }
 }

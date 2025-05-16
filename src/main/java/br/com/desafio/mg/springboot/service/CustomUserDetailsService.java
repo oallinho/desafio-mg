@@ -1,8 +1,8 @@
-package br.com.desafio.mg.springboot.security.service;
+package br.com.desafio.mg.springboot.service;
 
 import br.com.desafio.mg.springboot.model.UserModel;
 import br.com.desafio.mg.springboot.repository.UserRepository;
-import br.com.desafio.mg.springboot.security.CustomUserDetails;
+import br.com.desafio.mg.springboot.security.user.CustomUserDetails;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

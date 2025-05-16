@@ -1,7 +1,7 @@
-package br.com.desafio.mg.springboot.security;
+package br.com.desafio.mg.springboot.security.config;
 
 import br.com.desafio.mg.springboot.security.jwt.JwtAuthenticationFilter;
-import br.com.desafio.mg.springboot.security.service.CustomUserDetailsService;
+import br.com.desafio.mg.springboot.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

@@ -1,7 +1,5 @@
 package br.com.desafio.mg.springboot.model;
 
-import br.com.desafio.mg.springboot.dto.TransactionDTO;
-import br.com.desafio.mg.springboot.enums.DrinkType;
 import br.com.desafio.mg.springboot.enums.TransactionType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;

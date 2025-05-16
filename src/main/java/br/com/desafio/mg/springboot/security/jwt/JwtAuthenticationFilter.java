@@ -1,6 +1,6 @@
 package br.com.desafio.mg.springboot.security.jwt;
 
-import br.com.desafio.mg.springboot.security.service.CustomUserDetailsService;
+import br.com.desafio.mg.springboot.service.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
