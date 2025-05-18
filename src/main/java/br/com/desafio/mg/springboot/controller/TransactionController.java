@@ -39,6 +39,5 @@ public class TransactionController {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         return transactionService.transferDrink(drink, userDetails.getUsername());
     }
-
 }
 

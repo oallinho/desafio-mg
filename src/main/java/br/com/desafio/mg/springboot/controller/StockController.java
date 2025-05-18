@@ -17,12 +17,10 @@ import java.util.List;
 public class StockController {
 
     private final StockService stockService;
-    private final SectionService sectionService;
 
     @Autowired
     public StockController(StockService stockService, SectionService sectionService) {
         this.stockService = stockService;
-        this.sectionService = sectionService;
     }
 
     @GetMapping

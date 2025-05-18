@@ -19,7 +19,8 @@ public class TransactionEventListener implements ApplicationListener<Transaction
                 event.getDrinkId(),
                 event.getSectionId(),
                 event.getResponsible(),
-                event.getType()
+                event.getType(),
+                event.getMessage()
         );
     }
 }

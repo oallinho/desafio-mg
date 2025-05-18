@@ -13,13 +13,15 @@ public class TransactionEvent extends ApplicationEvent {
     private final Long sectionId;
     private final String responsible;
     private final TransactionType type;
+    private final String message;
 
-    public TransactionEvent(Object source, Long drinkId, Long sectionId, String responsible, TransactionType type) {
+    public TransactionEvent(Object source, Long drinkId, Long sectionId, String responsible, TransactionType type, String message) {
         super(source);
         this.drinkId = drinkId;
         this.sectionId = sectionId;
         this.responsible = responsible;
         this.type = type;
+        this.message = message;
     }
 }
 

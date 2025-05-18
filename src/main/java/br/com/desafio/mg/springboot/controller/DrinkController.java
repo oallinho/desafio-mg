@@ -28,32 +28,30 @@ public class DrinkController {
 
     @GetMapping
     public ResponseEntity<List<DrinkDTO>> getAllDrinks(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        List<DrinkModel> drinks = drinkService.getAllDrinks();
-        List<DrinkDTO> response = drinks.stream().map(DrinkDTO::new).toList();
+        List<DrinkDTO> drinks = drinkService.getAllDrinks();
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(drinks);
     }
 
     @GetMapping(("/drinks-by-section/{sectionId}"))
     public ResponseEntity<List<DrinkDTO>> getDrinksBySectionId(@PathVariable Long sectionId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        List<DrinkModel> drinks = drinkService.getDrinksBySection(sectionId);
-        List<DrinkDTO> response = drinks.stream().map(DrinkDTO::new).toList();
+        List<DrinkDTO> drinks = drinkService.getDrinksBySection(sectionId);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(drinks);
     }
 
     @PostMapping
     public ResponseEntity<DrinkDTO> createDrink(@RequestBody DrinkDTO request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        DrinkDTO created = drinkService.createDrink(request);
+        DrinkDTO created = drinkService.createDrink(request, userDetails.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{drinkId}/sell")
     public ResponseEntity<Void> sellDrink(@PathVariable Long drinkId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        drinkService.sellDrink(drinkId);
+        drinkService.sellDrink(drinkId, userDetails.getUsername());
         return ResponseEntity.noContent().build();
     }
 

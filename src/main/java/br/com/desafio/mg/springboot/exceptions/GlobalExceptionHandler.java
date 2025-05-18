@@ -8,6 +8,7 @@ import br.com.desafio.mg.springboot.exceptions.section.MaximumSectionsException;
 import br.com.desafio.mg.springboot.exceptions.section.SectionCapacityExceededException;
 import br.com.desafio.mg.springboot.exceptions.section.SectionNotFoundException;
 import br.com.desafio.mg.springboot.exceptions.stock.StockNotFoundException;
+import br.com.desafio.mg.springboot.exceptions.transaction.DrinkAlreadyInSectionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -63,6 +64,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DrinkAlreadySoldException.class)
     public ResponseEntity<ErrorDetails> handleSectionCapacityExceeded(DrinkAlreadySoldException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(buildError(HttpStatus.BAD_REQUEST, ex.getMessage()));
+    }
+
+    @ExceptionHandler(DrinkAlreadyInSectionException.class)
+    public ResponseEntity<ErrorDetails> handleSameSectionException(DrinkAlreadyInSectionException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(buildError(HttpStatus.BAD_REQUEST, ex.getMessage()));
     }

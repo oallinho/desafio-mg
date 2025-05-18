@@ -13,7 +13,7 @@ public interface TransactionRepository extends JpaRepository<TransactionModel, L
     @Query("SELECT t FROM TransactionModel t WHERE " +
             "(COALESCE(:type, t.type) = t.type) AND " +
             "(:responsible IS NULL OR t.responsible = :responsible)")
-    List<TransactionModel> findWithFiltersWithoutDates(
+    List<TransactionModel> findWithFilters(
             @Param("type") TransactionType type,
             @Param("responsible") String responsible);
 }

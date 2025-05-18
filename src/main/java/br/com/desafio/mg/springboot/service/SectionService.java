@@ -59,12 +59,14 @@ public class SectionService {
         return new SectionDTO(saved);
     }
 
-    public List<SectionModel> getAllSections() {
-        return sectionRepository.findAll();
+    public List<SectionDTO> getAllSections() {
+        List<SectionModel> section = sectionRepository.findAll();
+
+        return section.stream().map(SectionDTO::new).collect(Collectors.toList());
     }
 
-    public SectionModel getSectionById(Long id) {
-        return findSectionOrThrow(id);
+    public Optional<SectionDTO> getSectionById(Long id) {
+        return sectionRepository.findById(id).map(SectionDTO::new);
     }
 
     public SectionModel saveSection(SectionModel drink) {
@@ -76,8 +78,10 @@ public class SectionService {
         sectionRepository.delete(section);
     }
 
-    public List<SectionModel> getSectionsByStockId(Long stockId) {
-        return sectionRepository.findByStockId(stockId);
+    public List<SectionDTO> getSectionsByStockId(Long stockId) {
+        List<SectionModel> section = sectionRepository.findByStockId(stockId);
+
+        return section.stream().map(SectionDTO::new).collect(Collectors.toList());
     }
 
     public void saveAll(List<SectionModel> sections) {
