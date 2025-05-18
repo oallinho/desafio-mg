@@ -14,6 +14,7 @@ public class TransactionDTO {
     private Long sectionId;
     private Double volume;
     private String responsible;
+    private String message;
     private LocalDateTime createdAt;
 
     public TransactionDTO(TransactionModel transaction) {
@@ -23,6 +24,7 @@ public class TransactionDTO {
         this.sectionId = transaction.getSection().getId();
         this.volume = transaction.getVolume();
         this.responsible = transaction.getResponsible();
+        this.message = transaction.getMessage();
         this.createdAt = transaction.getCreatedAt();
     }
 }

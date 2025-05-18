@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DrinkService {
@@ -42,8 +43,11 @@ public class DrinkService {
         this.eventPublisher = eventPublisher;
     }
 
-    public List<DrinkModel> getAllDrinks() {
-        return drinkRepository.findAll();
+    public List<DrinkDTO> getAllDrinks() {
+        return drinkRepository.findAll()
+                .stream()
+                .map(DrinkDTO::new)
+                .collect(Collectors.toList());
     }
 
     public Optional<DrinkDTO> getDrinkById(Long id) {
@@ -51,27 +55,30 @@ public class DrinkService {
                 .map(DrinkDTO::new);
     }
 
-    public List<DrinkModel> getDrinksBySection(Long sectionId) {
-
-        return drinkRepository.getDrinksBySectionId(sectionId);
+    public List<DrinkDTO> getDrinksBySection(Long sectionId) {
+        List<DrinkModel> drinks = drinkRepository.getDrinksBySectionId(sectionId);
+        return drinks.stream()
+                .map(DrinkDTO::new)
+                .toList();
     }
 
-    public DrinkDTO createDrink(DrinkDTO request) {
-        SectionModel section = sectionService.getSectionById(request.getSectionId());
+    public DrinkDTO createDrink(DrinkDTO dto, String responsible) {
+        SectionModel section = sectionService.findSectionOrThrow(dto.getSectionId());
 
-        sectionValidator.validateDrinkType(section, request.getType());
-        sectionValidator.validateSectionCapacity(section, request.getVolume());
+        sectionValidator.validateDrinkType(section, dto.getType());
+        sectionValidator.validateSectionCapacity(section, dto.getVolume());
 
-        DrinkModel drink = request.toModel(section);
-        drink.setName(request.getName());
-        drink.setVolume(request.getVolume());
-        drink.setType(request.getType());
+        DrinkModel drink = dto.toModel(section);
+        drink.setName(dto.getName());
+        drink.setVolume(dto.getVolume());
+        drink.setType(dto.getType());
         drink.setSection(section);
         drink.setStatus(DrinkStatus.ACTIVE);
 
         drink = drinkRepository.save(drink);
 
-        eventPublisher.publishEvent(new TransactionEvent(this, drink.getId(), section.getId(), "allan.paiva", TransactionType.ENTRY));
+        eventPublisher.publishEvent(new TransactionEvent(this, drink.getId(),
+                dto.getSectionId(), responsible, TransactionType.ENTRY, String.format("New drink '%s' registered in Section %d", drink.getName(), drink.getSection().getId())));
 
         return new DrinkDTO(drink);
     }
@@ -94,7 +101,7 @@ public class DrinkService {
         drinkRepository.save(drink);
     }
 
-    public void sellDrink(Long drinkId){
+    public void sellDrink(Long drinkId, String responsible){
         DrinkModel drink = findDrinkOrThrow(drinkId);
 
         if (drink.getStatus() == DrinkStatus.SOLD)
@@ -103,8 +110,8 @@ public class DrinkService {
         eventPublisher.publishEvent(new TransactionEvent(this,
                 drink.getId(),
                 drink.getSection().getId(),
-                "allan.paiva",
-                TransactionType.EXIT));
+                responsible,
+                TransactionType.EXIT, String.format("Drink '%s' sold and removed from Section %d", drink.getName(), drink.getSection().getId())));
 
         drink.setSection(null);
         drink.setUpdatedAt(LocalDateTime.now());

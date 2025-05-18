@@ -5,17 +5,19 @@ import br.com.desafio.mg.springboot.dto.DrinkTransferDTO;
 import br.com.desafio.mg.springboot.enums.TransactionType;
 import br.com.desafio.mg.springboot.exceptions.drink.DrinkNotFoundException;
 import br.com.desafio.mg.springboot.exceptions.section.SectionNotFoundException;
+import br.com.desafio.mg.springboot.exceptions.transaction.DrinkAlreadyInSectionException;
 import br.com.desafio.mg.springboot.model.DrinkModel;
 import br.com.desafio.mg.springboot.model.SectionModel;
 import br.com.desafio.mg.springboot.model.TransactionModel;
 import br.com.desafio.mg.springboot.repository.DrinkRepository;
 import br.com.desafio.mg.springboot.repository.SectionRepository;
-import br.com.desafio.mg.springboot.repository.StockRepository;
 import br.com.desafio.mg.springboot.repository.TransactionRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class TransactionService {
@@ -25,14 +27,17 @@ public class TransactionService {
     private final SectionRepository sectionRepository;
     private final DrinkService drinkService;
 
-    public TransactionService(TransactionRepository transactionRepository, DrinkRepository drinkRepository, SectionRepository sectionRepository, StockRepository stockRepository, DrinkService drinkService) {
+    public TransactionService(TransactionRepository transactionRepository,
+            DrinkRepository drinkRepository,
+            SectionRepository sectionRepository,
+            DrinkService drinkService) {
         this.transactionRepository = transactionRepository;
         this.drinkRepository = drinkRepository;
         this.sectionRepository = sectionRepository;
         this.drinkService = drinkService;
     }
 
-    public TransactionDTO registerTransaction(Long drinkId, Long sectionId, String responsible, TransactionType type) {
+    public TransactionDTO registerTransaction(Long drinkId, Long sectionId, String responsible, TransactionType type, String message) {
         DrinkModel drink = drinkRepository.findById(drinkId)
                 .orElseThrow(() -> new DrinkNotFoundException(drinkId));
 
@@ -45,6 +50,7 @@ public class TransactionService {
         transaction.setStock(section.getStock());
         transaction.setVolume(drink.getVolume());
         transaction.setResponsible(responsible);
+        transaction.setMessage(message);
         transaction.setType(type);
         transaction.setCreatedAt(LocalDateTime.now());
 
@@ -53,6 +59,7 @@ public class TransactionService {
         return toDTO(saved);
     }
 
+    @Transactional
     public TransactionDTO transferDrink(DrinkTransferDTO request, String responsible) {
         Long drinkId = request.getIdDrink();
         Long newSectionId = request.getNewSectionId();
@@ -60,18 +67,30 @@ public class TransactionService {
         DrinkModel drink = drinkRepository.findById(drinkId)
                 .orElseThrow(() -> new DrinkNotFoundException(drinkId));
 
+        if(Objects.equals(drink.getSection().getId(), request.getNewSectionId()))
+            throw new DrinkAlreadyInSectionException();
+
         SectionModel section = sectionRepository.findById(newSectionId)
                 .orElseThrow(() -> new SectionNotFoundException(newSectionId));
 
+        Long originSectionId = drink.getSection().getId();
+
+        registerTransaction(drinkId, originSectionId, responsible, TransactionType.EXIT,
+                String.format("Drink transferred to Section %d", newSectionId));
+
         drinkService.updateDrink(drinkId, newSectionId);
 
-        return registerTransaction(drinkId, newSectionId, "allan.paiva", TransactionType.TRANSFER);
-    }
 
+        registerTransaction(drinkId, newSectionId, responsible, TransactionType.ENTRY,
+                String.format("Drink received from Section %d", originSectionId));
+
+        return registerTransaction(drinkId, newSectionId, responsible, TransactionType.TRANSFER,
+                String.format("Drink transferred from Section %d to Section %d", originSectionId, newSectionId));
+    }
 
     public List<TransactionDTO> findTransactions(TransactionType type, String responsible) {
         List<TransactionModel> transactions = transactionRepository
-                .findWithFiltersWithoutDates(type, responsible);
+                .findWithFilters(type, responsible);
         return transactions.stream().map(this::toDTO).toList();
     }
 

@@ -5,6 +5,9 @@ import br.com.desafio.mg.springboot.enums.DrinkType;
 import br.com.desafio.mg.springboot.model.DrinkModel;
 import br.com.desafio.mg.springboot.model.SectionModel;
 import lombok.*;
+import org.springframework.lang.Nullable;
+
+import java.util.Optional;
 
 @Data
 @Getter
@@ -26,7 +29,9 @@ public class DrinkDTO {
         this.volume = drink.getVolume();
         this.type = drink.getType();
         this.status = drink.getStatus();
-        this.sectionId = drink.getSection().getId();
+        this.sectionId = Optional.ofNullable(drink.getSection())
+                .map(SectionModel::getId)
+                .orElse(null);
     }
 
     public DrinkModel toModel(SectionModel section) {

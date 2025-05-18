@@ -2,7 +2,6 @@ package br.com.desafio.mg.springboot.controller;
 
 import br.com.desafio.mg.springboot.dto.SectionDTO;
 import br.com.desafio.mg.springboot.enums.DrinkType;
-import br.com.desafio.mg.springboot.model.SectionModel;
 import br.com.desafio.mg.springboot.security.user.CustomUserDetails;
 import br.com.desafio.mg.springboot.service.SectionService;
 import br.com.desafio.mg.springboot.service.StockService;
@@ -13,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/section")
@@ -26,7 +26,7 @@ public class SectionController {
     }
 
     @GetMapping
-    public List<SectionModel> getAllSections(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public List<SectionDTO> getAllSections(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return sectionService.getAllSections();
     }
 
@@ -38,9 +38,9 @@ public class SectionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SectionModel> getSectionById(@PathVariable Long id,
+    public ResponseEntity<Optional<SectionDTO>> getSectionById(@PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        SectionModel section = sectionService.getSectionById(id);
+        Optional<SectionDTO> section = sectionService.getSectionById(id);
         return ResponseEntity.ok(section);
     }
 
@@ -64,6 +64,4 @@ public class SectionController {
                 .body("No sections available")
                 : ResponseEntity.ok(availableSections);
     }
-
-
 }

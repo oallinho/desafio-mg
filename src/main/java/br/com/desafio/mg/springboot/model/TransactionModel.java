@@ -34,6 +34,8 @@ public class TransactionModel {
     @Column(nullable = false)
     private String responsible;
 
+    private String message;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "drink_id", referencedColumnName = "id")
     private DrinkModel drink;
