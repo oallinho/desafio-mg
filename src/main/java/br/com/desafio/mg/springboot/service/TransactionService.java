@@ -45,6 +45,7 @@ public class TransactionService {
                 .orElseThrow(() -> new SectionNotFoundException(sectionId));
 
         TransactionModel transaction = new TransactionModel();
+
         transaction.setDrink(drink);
         transaction.setSection(section);
         transaction.setStock(section.getStock());

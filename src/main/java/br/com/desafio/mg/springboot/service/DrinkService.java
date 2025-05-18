@@ -35,7 +35,11 @@ public class DrinkService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    public DrinkService(DrinkRepository drinkRepository, SectionService sectionService, SectionRepository sectionRepository, SectionValidator sectionValidator, ApplicationEventPublisher eventPublisher) {
+    public DrinkService(DrinkRepository drinkRepository,
+            SectionService sectionService,
+            SectionRepository sectionRepository,
+            SectionValidator sectionValidator,
+            ApplicationEventPublisher eventPublisher) {
         this.drinkRepository = drinkRepository;
         this.sectionService = sectionService;
         this.sectionRepository = sectionRepository;
@@ -78,7 +82,8 @@ public class DrinkService {
         drink = drinkRepository.save(drink);
 
         eventPublisher.publishEvent(new TransactionEvent(this, drink.getId(),
-                dto.getSectionId(), responsible, TransactionType.ENTRY, String.format("New drink '%s' registered in Section %d", drink.getName(), drink.getSection().getId())));
+                dto.getSectionId(), responsible, TransactionType.ENTRY,
+                String.format("New drink '%s' registered in Section %d", drink.getName(), drink.getSection().getId())));
 
         return new DrinkDTO(drink);
     }
@@ -111,7 +116,8 @@ public class DrinkService {
                 drink.getId(),
                 drink.getSection().getId(),
                 responsible,
-                TransactionType.EXIT, String.format("Drink '%s' sold and removed from Section %d", drink.getName(), drink.getSection().getId())));
+                TransactionType.EXIT,
+                String.format("Drink '%s' sold and removed from Section %d", drink.getName(), drink.getSection().getId())));
 
         drink.setSection(null);
         drink.setUpdatedAt(LocalDateTime.now());

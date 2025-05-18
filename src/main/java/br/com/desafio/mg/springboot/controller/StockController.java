@@ -15,7 +15,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/stock")
 public class StockController {
-
     private final StockService stockService;
 
     @Autowired
@@ -30,11 +29,8 @@ public class StockController {
         List<StockDTO> response = stock.stream()
                 .map(StockDTO::new)
                 .toList();
-
         return ResponseEntity.ok(response);
     }
-
-
 
     @PostMapping
     public StockDTO createStock(@RequestBody StockDTO stock,
@@ -55,5 +51,4 @@ public class StockController {
         stockService.deleteStock(id);
         return ResponseEntity.noContent().build();
     }
-
 }

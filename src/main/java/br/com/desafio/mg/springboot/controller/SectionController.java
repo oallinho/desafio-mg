@@ -17,7 +17,6 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/section")
 public class SectionController {
-
     private final SectionService sectionService;
 
     @Autowired
@@ -36,7 +35,6 @@ public class SectionController {
         SectionDTO created = sectionService.createSection(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
-
     @GetMapping("/{id}")
     public ResponseEntity<Optional<SectionDTO>> getSectionById(@PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -57,7 +55,6 @@ public class SectionController {
             @RequestParam(required = false) Double volume,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-
         List<SectionDTO> availableSections = sectionService.getFilteredSections(type, volume);
         return availableSections.isEmpty()
                 ? ResponseEntity.status(HttpStatus.NOT_FOUND)

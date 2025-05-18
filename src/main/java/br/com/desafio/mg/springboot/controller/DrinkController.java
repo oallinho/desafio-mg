@@ -18,7 +18,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/drink")
 public class DrinkController {
-
     private final DrinkService drinkService;
 
     @Autowired
@@ -29,7 +28,6 @@ public class DrinkController {
     @GetMapping
     public ResponseEntity<List<DrinkDTO>> getAllDrinks(@AuthenticationPrincipal CustomUserDetails userDetails) {
         List<DrinkDTO> drinks = drinkService.getAllDrinks();
-
         return ResponseEntity.ok(drinks);
     }
 
@@ -37,7 +35,6 @@ public class DrinkController {
     public ResponseEntity<List<DrinkDTO>> getDrinksBySectionId(@PathVariable Long sectionId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         List<DrinkDTO> drinks = drinkService.getDrinksBySection(sectionId);
-
         return ResponseEntity.ok(drinks);
     }
 
@@ -59,7 +56,6 @@ public class DrinkController {
     public ResponseEntity<DrinkDTO> getDrinkById(@PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         return drinkService.getDrinkById(id).map(ResponseEntity::ok).orElseThrow(() -> new DrinkNotFoundException(id));
-
     }
 
     @DeleteMapping("/{id}")
@@ -74,5 +70,4 @@ public class DrinkController {
         Map<DrinkType, Double> volumeMap = drinkService.getTotalVolumeByType();
         return ResponseEntity.ok(volumeMap);
     }
-
 }
