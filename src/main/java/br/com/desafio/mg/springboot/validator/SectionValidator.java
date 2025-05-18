@@ -35,9 +35,6 @@ public class SectionValidator {
 
     private Map<Long, Double> buildCurrentVolumeMap() {
         List<Object[]> volumeData = drinkRepository.getCurrentVolumesBySection();
-        return volumeData.stream().collect(Collectors.toMap(
-                entry -> (Long) entry[0],
-                entry -> (Double) entry[1]
-        ));
+        return volumeData.stream().collect(Collectors.toMap(entry -> (Long) entry[0], entry -> (Double) entry[1]));
     }
 }

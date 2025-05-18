@@ -18,60 +18,51 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private ErrorDetails buildError(HttpStatus status, String message) {
-        return new ErrorDetails(status.value(), message, System.currentTimeMillis());
-    }
-
     @ExceptionHandler({StockNotFoundException.class, SectionNotFoundException.class, DrinkNotFoundException.class})
     public ResponseEntity<ErrorDetails> handleNotFound(RuntimeException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(buildError(HttpStatus.NOT_FOUND, ex.getMessage()));
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorDetails> handleValidationErrors(MethodArgumentNotValidException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(buildError(HttpStatus.BAD_REQUEST, "Validation failed: " + ex.getMessage()));
+    @ExceptionHandler({
+            MethodArgumentNotValidException.class,
+            HttpMessageNotReadableException.class,
+            DivergentDrinkTypeException.class,
+            MaximumSectionsException.class,
+            SectionCapacityExceededException.class,
+            DrinkAlreadySoldException.class,
+            DrinkAlreadyInSectionException.class})
+    public ResponseEntity<ErrorDetails> handleBadRequest(Exception ex) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String message;
+
+        if (ex instanceof MethodArgumentNotValidException validationException) {
+            List<String> errors = validationException.getBindingResult().getFieldErrors()
+                    .stream().map(error -> error.getField() + ": " + error.getDefaultMessage()).collect(Collectors.toList());
+
+            message = "Validation failed: " + String.join("; ", errors);
+
+        } else if (ex instanceof HttpMessageNotReadableException) {
+            List<String> validTypes = Arrays.stream(DrinkType.values()).map(Enum::name).toList();
+
+            message = "Invalid drink type provided. Valid types are: " + String.join(", ", validTypes);
+        } else {
+            message = ex.getMessage();
+        }
+
+        return buildErrorResponse(status, message);
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorDetails> handleEnumConversionError(HttpMessageNotReadableException ex) {
-        List<String> validTypes = Arrays.stream(DrinkType.values()).map(Enum::name).toList();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(buildError(HttpStatus.BAD_REQUEST, "Invalid drink type provided. Valid types are: " + validTypes));
+    private ResponseEntity<ErrorDetails> buildErrorResponse(HttpStatus status, String message) {
+        return ResponseEntity.status(status).body(buildError(status, message));
     }
 
-    @ExceptionHandler(DivergentDrinkTypeException.class)
-    public ResponseEntity<ErrorDetails> handleDivergentDrinkType(DivergentDrinkTypeException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(buildError(HttpStatus.BAD_REQUEST, ex.getMessage()));
-    }
-    @ExceptionHandler(MaximumSectionsException.class)
-    public ResponseEntity<ErrorDetails> handleMaximumSections(MaximumSectionsException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(buildError(HttpStatus.BAD_REQUEST, ex.getMessage()));
-    }
-
-    @ExceptionHandler(SectionCapacityExceededException.class)
-    public ResponseEntity<ErrorDetails> handleSectionCapacityExceeded(SectionCapacityExceededException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(buildError(HttpStatus.BAD_REQUEST, ex.getMessage()));
-    }
-
-    @ExceptionHandler(DrinkAlreadySoldException.class)
-    public ResponseEntity<ErrorDetails> handleSectionCapacityExceeded(DrinkAlreadySoldException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(buildError(HttpStatus.BAD_REQUEST, ex.getMessage()));
-    }
-
-    @ExceptionHandler(DrinkAlreadyInSectionException.class)
-    public ResponseEntity<ErrorDetails> handleSameSectionException(DrinkAlreadyInSectionException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(buildError(HttpStatus.BAD_REQUEST, ex.getMessage()));
+    private ErrorDetails buildError(HttpStatus status, String message) {
+        return new ErrorDetails(status.value(), message, System.currentTimeMillis());
     }
 }
 

@@ -18,10 +18,8 @@ import java.util.stream.Collectors;
 @Service
 public class SectionService {
 
-
     private final SectionRepository sectionRepository;
     private final StockService stockService;
-
     private final DrinkRepository drinkRepository;
 
     @Autowired
@@ -61,7 +59,6 @@ public class SectionService {
 
     public List<SectionDTO> getAllSections() {
         List<SectionModel> section = sectionRepository.findAll();
-
         return section.stream().map(SectionDTO::new).collect(Collectors.toList());
     }
 
@@ -93,15 +90,10 @@ public class SectionService {
     }
 
     public List<SectionDTO> getFilteredSections(DrinkType type, Double requiredVolume) {
-        Map<Long, Double> sectionVolumeMap = drinkRepository.getCurrentVolumesBySection().stream()
-                .collect(Collectors.toMap(
-                        entry -> (Long) entry[0],
-                        entry -> (Double) entry[1]
-                ));
+        Map<Long, Double> sectionVolumeMap = drinkRepository.getCurrentVolumesBySection()
+                .stream().collect(Collectors.toMap(entry -> (Long) entry[0], entry -> (Double) entry[1]));
 
-        List<SectionModel> sections = (type == null)
-                ? sectionRepository.findAll()
-                : sectionRepository.findByPermittedType(type);
+        List<SectionModel> sections = (type == null) ? sectionRepository.findAll() : sectionRepository.findByPermittedType(type);
 
         return sections.stream().map(section -> {
             double currentVolume = sectionVolumeMap.getOrDefault(section.getId(), 0.0);
@@ -109,8 +101,7 @@ public class SectionService {
         }).filter(entry -> {
             SectionModel section = entry.getKey();
             double currentVolume = entry.getValue();
-            return currentVolume < section.getMaximumCapacity()
-                    && (requiredVolume == null || currentVolume + requiredVolume <= section.getMaximumCapacity());
+            return currentVolume < section.getMaximumCapacity() && (requiredVolume == null || currentVolume + requiredVolume <= section.getMaximumCapacity());
         }).map(entry -> new SectionDTO(entry.getKey(), entry.getValue())).toList();
     }
 }

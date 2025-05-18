@@ -6,6 +6,7 @@ import br.com.desafio.mg.springboot.model.StockModel;
 import br.com.desafio.mg.springboot.repository.StockRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -24,15 +25,12 @@ public class StockService {
 
     public StockDTO getStockById(Long id) {
         StockModel stockModel = findStockOrThrow(id);
-
         return new StockDTO(stockModel);
     }
 
     public StockDTO save(StockDTO stock) {
         StockModel stockModel = stock.toModel();
-
         StockModel savedStock = stockRepository.save(stockModel);
-
         return new StockDTO(savedStock);
     }
 
